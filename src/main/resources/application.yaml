@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: manager
+  datasource:
+    url: jdbc:postgresql://localhost:5432/manager
+    username: postgres
+    password: keyword.
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
