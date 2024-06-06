@@ -29,8 +29,8 @@ public class User {
     @OneToMany(mappedBy = "member")
     private Set<Team> projects;
     @CreatedDate
-    private OffsetDateTime created_at;
-    private OffsetDateTime updated_at;
+    private OffsetDateTime createdAt;
+    private OffsetDateTime updatedAt;
 
     private String getAge(){
         LocalDate today = LocalDate.now();

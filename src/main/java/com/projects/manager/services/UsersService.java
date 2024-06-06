@@ -19,22 +19,19 @@ public class UsersService implements IUsersService {
     private UserRepository repository;
 
     @Override
-    public Optional<User> findOne(UUID id) {
-        return repository.findById(id);
+    public Optional<User> findOne(UUID id) throws CustomException{
+        var user = Optional.ofNullable(repository.findById(id).orElseThrow(() -> new CustomException("User not found")));
+        return user;
     }
 
     @Override
     public List<User> findAll() {
-
         return repository.findAll();
     }
 
     @Override
-    public boolean delete(UUID id) {
-        var user = repository.findById(id);
-        if (user.isEmpty()) {
-            return false;
-        }
+    public boolean delete(UUID id) throws CustomException {
+        var user = repository.findById(id).orElseThrow(() -> new CustomException("User not found."));
         repository.deleteById(id);
         return true;
     }
@@ -47,25 +44,11 @@ public class UsersService implements IUsersService {
                     user.setLastname(request.getLastname());
                     user.setBirth(request.getBirth());
                     user.setGender(request.getGender());
-                    user.setUpdated_at(OffsetDateTime.now());
+                    user.setUpdatedAt(OffsetDateTime.now());
                     repository.save(user);
                     return user;
                 })
                 .orElseThrow(() -> new CustomException("User not found.."));
-//        var user = repository.findById(id)
-//                .orElseThrow(() -> new CustomException("User not found.."));
-//        if (user != null) {
-//            User entity = User.builder()
-//                    .firstname(request.getFirstname())
-//                    .lastname(request.getLastname())
-//                    .birth(request.getBirth())
-//                    .gender(request.getGender())
-//                    .updated_at(OffsetDateTime.now())
-//                    .build();
-//            repository.save(entity);
-//            return true;
-//        }
-//        return false;
     }
 
     @Override
@@ -73,12 +56,11 @@ public class UsersService implements IUsersService {
         var user = User.builder()
                 .birth(request.getBirth())
                 .gender(request.getGender())
-                .created_at(OffsetDateTime.now())
-                .updated_at(OffsetDateTime.now())
+                .createdAt(OffsetDateTime.now())
+                .updatedAt(OffsetDateTime.now())
                 .firstname(request.getFirstname())
                 .lastname(request.getLastname())
                 .build();
-        System.out.println(user.getBirth());
         repository.save(user);
         return user;
     }

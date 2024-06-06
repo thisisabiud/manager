@@ -23,16 +23,16 @@ public class Project {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     @CreatedDate
-    private OffsetDateTime created_at;
-    private OffsetDateTime updated_at;
+    private OffsetDateTime createdAt;
+    private OffsetDateTime updatedAt;
     private String title;
     private String description;
-    private double expected_budget;
-    private double available_budget;
+    private double expectedBudget;
+    private double availableBudget;
     private ProjectStatus status;
-    private double expected_profit;
+    private double expectedProfit;
     @OneToMany(mappedBy = "project")
     private Set<Team> members;
-    private OffsetDateTime starting_time;
-    private OffsetDateTime finishing_time;
+    private OffsetDateTime startingTime;
+    private OffsetDateTime finishingTime;
 }
