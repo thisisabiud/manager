@@ -1,6 +1,10 @@
+/**
+ * @author Abiud T Samo
+ */
 package com.projects.manager.services;
 
-import com.projects.manager.models.DTOs.UserDTO;
+import com.projects.manager.models.DTOs.UserResponseDTO;
+import com.projects.manager.models.DTOs.UserRequestDTO;
 import com.projects.manager.models.User;
 import com.projects.manager.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,36 +12,62 @@ import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 
 @Service
 public class UsersService implements IUsersService {
 
+    /**
+     * Dependency injection (user DAO)
+     */
     @Autowired
     private UserRepository repository;
 
-    @Override
-    public Optional<User> findOne(UUID id) throws CustomException{
-        var user = Optional.ofNullable(repository.findById(id).orElseThrow(() -> new CustomException("User not found")));
-        return user;
-    }
 
     @Override
-    public List<User> findAll() {
-        return repository.findAll();
+    public UserResponseDTO findOne(Long id) throws CustomException{
+        return repository.findById(id)
+                .map(user -> {
+                    return new UserResponseDTO(
+                            user.getId(),
+                            user.getFirstname(),
+                            user.getLastname(),
+                            user.getAge(),
+                            user.getGender(),
+                            user.getBirth().toString());
+                })
+                .orElseThrow(() -> new CustomException("User not found"));
+
     }
 
+
     @Override
-    public boolean delete(UUID id) throws CustomException {
-        var user = repository.findById(id).orElseThrow(() -> new CustomException("User not found."));
-        repository.deleteById(id);
+    public List<UserResponseDTO> findAll() {
+        return repository.findAll().stream()
+                .map(user ->
+                        new UserResponseDTO(
+                                user.getId(),
+                                user.getFirstname(),
+                                user.getLastname(),
+                                user.getAge(),
+                                user.getGender(),
+                                user.getBirth().toString()
+                        )
+                ).toList();
+    }
+
+
+    @Override
+    public boolean delete(Long id) throws CustomException {
+       var user = repository.findById(id)
+                .orElseThrow(() -> new CustomException("User not found."));
+        repository.deleteById(user.getId());
         return true;
     }
 
+
     @Override
-    public User update(UserDTO request, UUID id) throws CustomException {
+    public UserResponseDTO update(UserRequestDTO request, Long id) throws CustomException {
         return repository.findById(id)
                 .map(user -> {
                     user.setFirstname(request.getFirstname());
@@ -46,13 +76,15 @@ public class UsersService implements IUsersService {
                     user.setGender(request.getGender());
                     user.setUpdatedAt(OffsetDateTime.now());
                     repository.save(user);
-                    return user;
+                    return mapUserToDTO(user);
+
                 })
                 .orElseThrow(() -> new CustomException("User not found.."));
     }
 
+
     @Override
-    public User create(UserDTO request) {
+    public UserResponseDTO create(UserRequestDTO request) {
         var user = User.builder()
                 .birth(request.getBirth())
                 .gender(request.getGender())
@@ -62,6 +94,17 @@ public class UsersService implements IUsersService {
                 .lastname(request.getLastname())
                 .build();
         repository.save(user);
-        return user;
+        return mapUserToDTO(user);
+    }
+
+    private UserResponseDTO mapUserToDTO(User user){
+        return UserResponseDTO.builder()
+                .age(user.getAge())
+                .id(user.getId())
+                .birth(user.getBirth().toString())
+                .gender(user.getGender())
+                .firstname(user.getFirstname())
+                .lastname(user.getLastname())
+                .build();
     }
 }

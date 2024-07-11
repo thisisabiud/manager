@@ -6,11 +6,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
 
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
-import java.util.Set;
-import java.util.UUID;
+import java.util.Date;
+import java.util.List;
 
 @Entity
 @Builder
@@ -20,19 +20,23 @@ import java.util.UUID;
 @Table(name = "projects")
 public class Project {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
-    @CreatedDate
-    private OffsetDateTime createdAt;
-    private OffsetDateTime updatedAt;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private String title;
     private String description;
-    private double expectedBudget;
-    private double availableBudget;
+    private double requiredFund;
+    private double availableFund;
     private ProjectStatus status;
     private double expectedProfit;
-    @OneToMany(mappedBy = "project")
-    private Set<Team> members;
-    private OffsetDateTime startingTime;
-    private OffsetDateTime finishingTime;
+    private LocalDate starting;
+    private LocalDate finishing;
+
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
+    private List<Team> members;
+
+    @OneToMany(mappedBy = "taskProject", cascade = CascadeType.ALL)
+    private List<Task> tasks;
+
+    private OffsetDateTime createdAt;
+    private OffsetDateTime updatedAt;
 }
